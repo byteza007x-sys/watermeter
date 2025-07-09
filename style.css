@@ -116,3 +116,36 @@ body {
 .content-page.active {
   display: block;
 }
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.4em 0.6em;
+}
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.4em 0.6em;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.4em 0.6em;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
