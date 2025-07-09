@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Water Billing Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h4><i class="fa-solid fa-droplet"></i> <span class="sidebar-text">Water Billing</span></h4>
+      <button id="toggleSidebarBtn" aria-label="Toggle Sidebar"><i class="fa-solid fa-bars"></i></button>
+    </div>
+
+    <nav class="nav flex-column flex-grow-1 px-2">
+      <a class="nav-link active" onclick="showPage('dashboard')"><i class="fa-solid fa-gauge me-2"></i><span class="sidebar-text"> Dashboard</span></a>
+      <a class="nav-link" onclick="showPage('users')"><i class="fa-solid fa-user me-2"></i><span class="sidebar-text"> ผู้ใช้น้ำ</span></a>
+
+      <!-- เมนูบิล -->
+      <a class="nav-link" data-bs-toggle="collapse" href="#billSubMenu" role="button" aria-expanded="false" aria-controls="billSubMenu">
+        <i class="fa-solid fa-file-invoice-dollar me-2"></i><span class="sidebar-text"> บิล</span> <i class="fa-solid fa-caret-down float-end"></i>
+      </a>
+      <div class="collapse" id="billSubMenu">
+        <nav class="nav flex-column ms-3 mt-2">
+          <a class="nav-link text-white small" onclick="showPage('meter-record')">- <span class="sidebar-text">จดหน่วยมิเตอร์</span></a>
+          <a class="nav-link text-white small" onclick="showPage('record-history')">- <span class="sidebar-text">ประวัติการจดหน่วย</span></a>
+          <a class="nav-link text-white small" onclick="showPage('all-bills')">- <span class="sidebar-text">ใบแจ้งหนี้ทั้งหมด</span></a>
+        </nav>
+      </div>
+
+      <!-- เมนูจัดการข้อมูล -->
+      <a class="nav-link" data-bs-toggle="collapse" href="#manageDataSubMenu" role="button" aria-expanded="false" aria-controls="manageDataSubMenu">
+        <i class="fa-solid fa-gear me-2"></i><span class="sidebar-text"> จัดการข้อมูล</span> <i class="fa-solid fa-caret-down float-end"></i>
+      </a>
+      <div class="collapse" id="manageDataSubMenu">
+        <nav class="nav flex-column ms-3 mt-2">
+          <a class="nav-link text-white small" onclick="showPage('manage-users')">- <span class="sidebar-text">จัดการผู้ใช้น้ำ</span></a>
+          <a class="nav-link text-white small" onclick="showPage('manage-meters')">- <span class="sidebar-text">จัดการมิเตอร์</span></a>
+          <a class="nav-link text-white small" onclick="showPage('meter-map')">- <span class="sidebar-text">แผนที่มิเตอร์</span></a>
+          <a class="nav-link text-white small" onclick="showPage('manage-rates')">- <span class="sidebar-text">จัดการอัตราค่าน้ำ</span></a>
+        </nav>
+      </div>
+
+      <a class="nav-link" onclick="showPage('reports')"><i class="fa-solid fa-chart-line me-2"></i><span class="sidebar-text"> รายงาน</span></a>
+      <a class="nav-link mt-auto text-danger" href="#"><i class="fa-solid fa-right-from-bracket me-2"></i><span class="sidebar-text"> ออกจากระบบ</span></a>
+    </nav>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="content-page active">
+      <h2 class="fw-bold mb-4">แดชบอร์ดภาพรวม</h2>
+      <div class="row g-4 mb-4">
+        <div class="col-md-4">
+          <div class="card-box bg-danger">
+            <h6><i class="fa-solid fa-wallet"></i> ยอดค้างชำระ</h6>
+            <h3>0.00 บาท</h3>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-box bg-success">
+            <h6><i class="fa-solid fa-money-bill-wave"></i> รายรับเดือนนี้</h6>
+            <h3>0.00 บาท</h3>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-box bg-info">
+            <h6><i class="fa-solid fa-users"></i> ผู้ใช้น้ำทั้งหมด</h6>
+            <h3>1 คน</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header"><i class="fa-solid fa-chart-column"></i> ปริมาณการใช้น้ำ (รายเดือน)</div>
+            <div class="card-body" style="height: 200px;">
+              <p class="text-muted">[ พื้นที่แสดงกราฟ ]</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header"><i class="fa-solid fa-chart-pie"></i> สถานะการแจ้งหนี้</div>
+            <div class="card-body" style="height: 200px;">
+              <p class="text-muted">[ พื้นที่แสดงกราฟ ]</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Users Page -->
+    <div id="users" class="content-page">
+      <h2 class="fw-bold mb-4">ผู้ใช้น้ำทั้งหมด</h2>
+      <table class="table table-bordered bg-white">
+        <thead>
+          <tr><th>รหัส</th><th>ชื่อ</th><th>มิเตอร์</th><th>สถานะ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>001</td><td>นายสมชาย ใจดี</td><td>W-1001</td><td>ใช้งาน</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Meter Record Page -->
+      <div id="meter-record" class="content-page">
+      <h2 class="fw-bold mb-4">จดหน่วยมิเตอร์ (Manual)</h2>
+      <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+      <i class="fa-solid fa-droplet"></i> เลือกมิเตอร์
+      </div>
+      <div class="card-body bg-white text-dark rounded">
+      <form>
+        <div class="mb-3">
+          <label for="meterSelect" class="form-label fw-bold">กรุณาเลือกหมายเลขมิเตอร์</label>
+          <select class="form-select" id="meterSelect" onchange="handleMeterSelect(this)">
+            <option value="">-- กรุณาเลือกหมายเลขมิเตอร์ --</option>
+            <option value="W-1001">W-1001</option>
+            <option value="W-1002">W-1002</option>
+            <option value="W-1003">W-1003</option>
+          </select>
+        </div>
+        <p id="meterNote" class="text-muted mt-2">
+          เมื่อเลือกมิเตอร์ ระบบจะดึงค่าล่าสุดมาให้โดยอัตโนมัติ
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+    <!-- Record History Page -->
+    <div id="record-history" class="content-page">
+      <h2 class="fw-bold mb-4">ประวัติการจดหน่วย</h2>
+      <p>[ ตารางแสดงการจดย้อนหลัง ]</p>
+    </div>
+
+    <!-- All Bills Page -->
+    <div id="all-bills" class="content-page">
+      <h2 class="fw-bold mb-4">ใบแจ้งหนี้ทั้งหมด</h2>
+      <p>[ ตารางรายการบิลทั้งหมด ]</p>
+    </div>
+
+    <!-- Reports Page -->
+    <div id="reports" class="content-page">
+      <h2 class="fw-bold mb-4">รายงานสรุป</h2>
+      <p>รวมรายรับ / การใช้น้ำ / ค่าปรับ ประจำเดือน</p>
+      <div class="card mt-3">
+        <div class="card-body">
+          <p class="text-muted">[ กราฟรวมทั้งระบบจะแสดงที่นี่ ]</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+<!-- Manage Meters Page -->
+
+  <script>
+    function showPage(pageId) {
+      // ซ่อนทุกหน้าก่อน
+      document.querySelectorAll('.content-page').forEach(page => page.classList.remove('active'));
+
+      // แสดงหน้าที่เลือก
+      const selectedPage = document.getElementById(pageId);
+      if (selectedPage) {
+        selectedPage.classList.add('active');
+      }
+
+      // ลบ active จากทุกลิงก์
+      document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
+
+      // ใส่ active ให้กับลิงก์ที่คลิก
+      document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+        if (link.getAttribute('onclick')?.includes(pageId)) {
+          link.classList.add('active');
+        }
+      });
+
+      // เปิดเมนูบิลหากเป็นเมนูย่อยบิล
+      if (['meter-record', 'record-history', 'all-bills'].includes(pageId)) {
+        const collapseEl = document.getElementById('billSubMenu');
+        const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+        bsCollapse.show();
+      }
+
+      // เปิดเมนูย่อยจัดการข้อมูลหากเป็นเมนูย่อยในนี้
+      if (['manage-users', 'manage-meters', 'meter-map', 'manage-rates'].includes(pageId)) {
+        const collapseEl = document.getElementById('manageDataSubMenu');
+        const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+        bsCollapse.show();
+      }
+    }
+
+    // สลับคลาส collapsed ของ sidebar เมื่อกดปุ่ม hamburger
+    document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
+      document.querySelector('.sidebar').classList.toggle('collapsed');
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  function handleMeterSelect(select) {
+    const note = document.getElementById('meterNote');
+    if (select.value) {
+      note.textContent = `คุณเลือกมิเตอร์หมายเลข ${select.value} แล้ว กำลังโหลดข้อมูล...`;
+      // คุณสามารถเขียนโค้ดดึงข้อมูลล่าสุดจาก backend หรือ API ได้ตรงนี้
+    } else {
+      note.textContent = 'เมื่อเลือกมิเตอร์ ระบบจะดึงค่าล่าสุดมาให้โดยอัตโนมัติ';
+    }
+  }
+</script>
+
+</body>
+</html>
