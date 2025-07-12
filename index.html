@@ -1,659 +1,1050 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Water Billing Admin</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="style.css" />
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Water Billing Admin</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h4>
+          <i class="fa-solid fa-droplet"></i>
+          <span class="sidebar-text">Water Billing</span>
+        </h4>
+        <button id="toggleSidebarBtn" aria-label="Toggle Sidebar">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
 
-</head>
-<body>
+      <nav class="nav flex-column flex-grow-1 px-2">
+        <a class="nav-link active" onclick="showPage('dashboard')"
+          ><i class="fa-solid fa-gauge me-2"></i
+          ><span class="sidebar-text"> Dashboard</span></a
+        >
+        <a class="nav-link" onclick="showPage('users')"
+          ><i class="fa-solid fa-user me-2"></i
+          ><span class="sidebar-text"> ผู้ใช้น้ำ</span></a
+        >
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h4><i class="fa-solid fa-droplet"></i> <span class="sidebar-text">Water Billing</span></h4>
-      <button id="toggleSidebarBtn" aria-label="Toggle Sidebar"><i class="fa-solid fa-bars"></i></button>
+        <!-- เมนูบิล -->
+        <a
+          class="nav-link"
+          data-bs-toggle="collapse"
+          href="#billSubMenu"
+          role="button"
+          aria-expanded="false"
+          aria-controls="billSubMenu"
+        >
+          <i class="fa-solid fa-file-invoice-dollar me-2"></i
+          ><span class="sidebar-text"> บิล</span>
+          <i class="fa-solid fa-caret-down float-end"></i>
+        </a>
+        <div class="collapse" id="billSubMenu">
+          <nav class="nav flex-column ms-3 mt-2">
+            <a
+              class="nav-link text-white small"
+              onclick="showPage('meter-record')"
+              >- <span class="sidebar-text">จดหน่วยมิเตอร์</span></a
+            >
+            <a
+              class="nav-link text-white small"
+              onclick="showPage('record-history')"
+              >- <span class="sidebar-text">ประวัติการจดหน่วย</span></a
+            >
+            <a class="nav-link text-white small" onclick="showPage('all-bills')"
+              >- <span class="sidebar-text">ใบแจ้งหนี้ทั้งหมด</span></a
+            >
+          </nav>
+        </div>
+
+        <!-- เมนูจัดการข้อมูล -->
+        <a
+          class="nav-link"
+          data-bs-toggle="collapse"
+          href="#manageDataSubMenu"
+          role="button"
+          aria-expanded="false"
+          aria-controls="manageDataSubMenu"
+        >
+          <i class="fa-solid fa-gear me-2"></i
+          ><span class="sidebar-text"> จัดการข้อมูล</span>
+          <i class="fa-solid fa-caret-down float-end"></i>
+        </a>
+        <div class="collapse" id="manageDataSubMenu">
+          <nav class="nav flex-column ms-3 mt-2">
+            <a
+              class="nav-link text-white small"
+              onclick="showPage('manage-users')"
+              >- <span class="sidebar-text">จัดการผู้ใช้น้ำ</span></a
+            >
+            <a
+              class="nav-link text-white small"
+              onclick="showPage('manage-meters')"
+              >- <span class="sidebar-text">จัดการมิเตอร์</span></a
+            >
+            <a class="nav-link text-white small" onclick="showPage('meter-map')"
+              >- <span class="sidebar-text">แผนที่มิเตอร์</span></a
+            >
+            <a
+              class="nav-link text-white small"
+              onclick="showPage('manage-rates')"
+              >- <span class="sidebar-text">จัดการอัตราค่าน้ำ</span></a
+            >
+          </nav>
+        </div>
+
+        <a class="nav-link" onclick="showPage('reports')"
+          ><i class="fa-solid fa-chart-line me-2"></i
+          ><span class="sidebar-text"> รายงาน</span></a
+        >
+        <a class="nav-link mt-auto text-danger" href="#"
+          ><i class="fa-solid fa-right-from-bracket me-2"></i
+          ><span class="sidebar-text"> ออกจากระบบ</span></a
+        >
+      </nav>
     </div>
 
-    <nav class="nav flex-column flex-grow-1 px-2">
-      <a class="nav-link active" onclick="showPage('dashboard')"><i class="fa-solid fa-gauge me-2"></i><span class="sidebar-text"> Dashboard</span></a>
-      <a class="nav-link" onclick="showPage('users')"><i class="fa-solid fa-user me-2"></i><span class="sidebar-text"> ผู้ใช้น้ำ</span></a>
-
-      <!-- เมนูบิล -->
-      <a class="nav-link" data-bs-toggle="collapse" href="#billSubMenu" role="button" aria-expanded="false" aria-controls="billSubMenu">
-        <i class="fa-solid fa-file-invoice-dollar me-2"></i><span class="sidebar-text"> บิล</span> <i class="fa-solid fa-caret-down float-end"></i>
-      </a>
-      <div class="collapse" id="billSubMenu">
-        <nav class="nav flex-column ms-3 mt-2">
-          <a class="nav-link text-white small" onclick="showPage('meter-record')">- <span class="sidebar-text">จดหน่วยมิเตอร์</span></a>
-          <a class="nav-link text-white small" onclick="showPage('record-history')">- <span class="sidebar-text">ประวัติการจดหน่วย</span></a>
-          <a class="nav-link text-white small" onclick="showPage('all-bills')">- <span class="sidebar-text">ใบแจ้งหนี้ทั้งหมด</span></a>
-        </nav>
-      </div>
-
-      <!-- เมนูจัดการข้อมูล -->
-      <a class="nav-link" data-bs-toggle="collapse" href="#manageDataSubMenu" role="button" aria-expanded="false" aria-controls="manageDataSubMenu">
-        <i class="fa-solid fa-gear me-2"></i><span class="sidebar-text"> จัดการข้อมูล</span> <i class="fa-solid fa-caret-down float-end"></i>
-      </a>
-      <div class="collapse" id="manageDataSubMenu">
-        <nav class="nav flex-column ms-3 mt-2">
-          <a class="nav-link text-white small" onclick="showPage('manage-users')">- <span class="sidebar-text">จัดการผู้ใช้น้ำ</span></a>
-          <a class="nav-link text-white small" onclick="showPage('manage-meters')">- <span class="sidebar-text">จัดการมิเตอร์</span></a>
-          <a class="nav-link text-white small" onclick="showPage('meter-map')">- <span class="sidebar-text">แผนที่มิเตอร์</span></a>
-          <a class="nav-link text-white small" onclick="showPage('manage-rates')">- <span class="sidebar-text">จัดการอัตราค่าน้ำ</span></a>
-        </nav>
-      </div>
-
-      <a class="nav-link" onclick="showPage('reports')"><i class="fa-solid fa-chart-line me-2"></i><span class="sidebar-text"> รายงาน</span></a>
-      <a class="nav-link mt-auto text-danger" href="#"><i class="fa-solid fa-right-from-bracket me-2"></i><span class="sidebar-text"> ออกจากระบบ</span></a>
-    </nav>
-  </div>
-
-  <!-- Main content -->
-  <div class="main-content">
-
-    <!-- Dashboard Page -->
-    <div id="dashboard" class="content-page active">
-      <h2 class="fw-bold mb-4">แดชบอร์ดภาพรวม</h2>
-      <div class="row g-4 mb-4">
-        <div class="col-md-4">
-          <div class="card-box bg-danger">
-            <h6><i class="fa-solid fa-wallet"></i> ยอดค้างชำระ</h6>
-            <h3>0.00 บาท</h3>
+    <!-- Main content -->
+    <div class="main-content">
+      <!-- Dashboard Page -->
+      <div id="dashboard" class="content-page active">
+        <h2 class="fw-bold mb-4">แดชบอร์ดภาพรวม</h2>
+        <div class="row g-4 mb-4">
+          <div class="col-md-4">
+            <div class="card-box bg-danger">
+              <h6><i class="fa-solid fa-wallet"></i> ยอดค้างชำระ</h6>
+              <h3>0.00 บาท</h3>
+            </div>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card-box bg-success">
-            <h6><i class="fa-solid fa-money-bill-wave"></i> รายรับเดือนนี้</h6>
-            <h3>0.00 บาท</h3>
+          <div class="col-md-4">
+            <div class="card-box bg-success">
+              <h6>
+                <i class="fa-solid fa-money-bill-wave"></i> รายรับเดือนนี้
+              </h6>
+              <h3>0.00 บาท</h3>
+            </div>
           </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card-box bg-info">
-            <h6><i class="fa-solid fa-users"></i> ผู้ใช้น้ำทั้งหมด</h6>
-            <h3>1 คน</h3>
-          </div>
-        </div>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header"><i class="fa-solid fa-chart-column"></i> ปริมาณการใช้น้ำ (รายเดือน)</div>
-            <div class="card-body" style="height: 200px;">
-              <p class="text-muted">[ พื้นที่แสดงกราฟ ]</p>
+          <div class="col-md-4">
+            <div class="card-box bg-info">
+              <h6><i class="fa-solid fa-users"></i> ผู้ใช้น้ำทั้งหมด</h6>
+              <h3>1 คน</h3>
             </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header"><i class="fa-solid fa-chart-pie"></i> สถานะการแจ้งหนี้</div>
-            <div class="card-body" style="height: 200px;">
-              <p class="text-muted">[ พื้นที่แสดงกราฟ ]</p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <i class="fa-solid fa-chart-column"></i> ปริมาณการใช้น้ำ
+                (รายเดือน)
+              </div>
+              <div class="card-body" style="height: 200px">
+                <p class="text-muted">[ พื้นที่แสดงกราฟ ]</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <i class="fa-solid fa-chart-pie"></i> สถานะการแจ้งหนี้
+              </div>
+              <div class="card-body" style="height: 200px">
+                <p class="text-muted">[ พื้นที่แสดงกราฟ ]</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Users Page -->
-    <div id="users" class="content-page">
-      <h2 class="fw-bold mb-4">ผู้ใช้น้ำทั้งหมด</h2>
-      <table class="table table-bordered bg-white">
-        <thead>
-          <tr><th>รหัส</th><th>ชื่อ</th><th>มิเตอร์</th><th>สถานะ</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>001</td><td>นายสมชาย ใจดี</td><td>W-1001</td><td>ใช้งาน</td></tr>
-        </tbody>
-      </table>
-    </div>
 
-    <!-- Meter Record Page -->
+      <!-- Users Page -->
+      <div id="users" class="content-page">
+        <h2 class="fw-bold mb-4">ผู้ใช้น้ำทั้งหมด</h2>
+        <table class="table table-bordered bg-white">
+          <thead>
+            <tr>
+              <th>รหัส</th>
+              <th>ชื่อ</th>
+              <th>มิเตอร์</th>
+              <th>สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>001</td>
+              <td>นายสมชาย ใจดี</td>
+              <td>W-1001</td>
+              <td>ใช้งาน</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Meter Record Page -->
       <div id="meter-record" class="content-page">
-      <h2 class="fw-bold mb-4">จดหน่วยมิเตอร์ (Manual)</h2>
-      <div class="card shadow">
-      <div class="card-header bg-primary text-white">
-      <i class="fa-solid fa-droplet"></i> เลือกมิเตอร์
-      </div>
-      <div class="card-body bg-white text-dark rounded">
-      <form>
-        <div class="mb-3">
-          <label for="meterSelect" class="form-label fw-bold">กรุณาเลือกหมายเลขมิเตอร์</label>
-          <select class="form-select" id="meterSelect" onchange="handleMeterSelect(this)">
-            <option value="">-- กรุณาเลือกหมายเลขมิเตอร์ --</option>
-            <option value="W-1001">W-1001</option>
-            <option value="W-1002">W-1002</option>
-            <option value="W-1003">W-1003</option>
-          </select>
+        <h2 class="fw-bold mb-4">จดหน่วยมิเตอร์ (Manual)</h2>
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <i class="fa-solid fa-droplet"></i> เลือกมิเตอร์
+          </div>
+          <div class="card-body bg-white text-dark rounded">
+            <form>
+              <div class="mb-3">
+                <label for="meterSelect" class="form-label fw-bold"
+                  >กรุณาเลือกหมายเลขมิเตอร์</label
+                >
+                <select
+                  class="form-select"
+                  id="meterSelect"
+                  onchange="handleMeterSelect(this)"
+                >
+                  <option value="">-- กรุณาเลือกหมายเลขมิเตอร์ --</option>
+                  <option value="W-1001">W-1001</option>
+                  <option value="W-1002">W-1002</option>
+                  <option value="W-1003">W-1003</option>
+                </select>
+              </div>
+              <p id="meterNote" class="text-muted mt-2">
+                เมื่อเลือกมิเตอร์ ระบบจะดึงค่าล่าสุดมาให้โดยอัตโนมัติ
+              </p>
+            </form>
+          </div>
         </div>
-        <p id="meterNote" class="text-muted mt-2">
-          เมื่อเลือกมิเตอร์ ระบบจะดึงค่าล่าสุดมาให้โดยอัตโนมัติ
-        </p>
-      </form>
-    </div>
-  </div>
-</div>
+      </div>
 
-    <!-- Record History Page -->
-<div id="record-history" class="content-page">
-  <h2 class="fw-bold mb-4">ประวัติการจดหน่วย</h2>
+      <!-- Record History Page -->
+      <div id="record-history" class="content-page">
+        <h2 class="fw-bold mb-4">ประวัติการจดหน่วย</h2>
 
-  <div class="card shadow">
-    <div class="card-header bg-info text-white fw-bold">
-      <i class="fa-solid fa-clock-rotate-left me-2"></i> ประวัติการจดหน่วย
-    </div>
-    <div class="card-body bg-white">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-light text-center">
-            <tr>
-              <th>วันที่จด</th>
-              <th>หมายเลขมิเตอร์</th>
-              <th>เลขก่อนหน้า</th>
-              <th>เลขล่าสุด</th>
-              <th>ปริมาณที่ใช้ (หน่วย)</th>
-              <th>ผู้จด</th>
-              <th>สถานะ</th>
-            </tr>
-          </thead>
+        <div class="card shadow">
+          <div class="card-header bg-info text-white fw-bold">
+            <i class="fa-solid fa-clock-rotate-left me-2"></i> ประวัติการจดหน่วย
+          </div>
+          <div class="card-body bg-white">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light text-center">
+                  <tr>
+                    <th>วันที่จด</th>
+                    <th>หมายเลขมิเตอร์</th>
+                    <th>เลขก่อนหน้า</th>
+                    <th>เลขล่าสุด</th>
+                    <th>ปริมาณที่ใช้ (หน่วย)</th>
+                    <th>ผู้จด</th>
+                    <th>สถานะ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">01/07/2025</td>
+                    <td>W-1001</td>
+                    <td class="text-end">1234</td>
+                    <td class="text-end">1256</td>
+                    <td class="text-end text-success fw-bold">22</td>
+                    <td>สมชาย</td>
+                    <td class="text-center">
+                      <span class="badge bg-success">ปกติ</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">01/06/2025</td>
+                    <td>W-1001</td>
+                    <td class="text-end">1200</td>
+                    <td class="text-end">1234</td>
+                    <td class="text-end text-success fw-bold">34</td>
+                    <td>สมหญิง</td>
+                    <td class="text-center">
+                      <span class="badge bg-warning text-dark">รอตรวจสอบ</span>
+                    </td>
+                  </tr>
+                  <!-- สามารถเพิ่มข้อมูลใหม่ได้ที่นี่ -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Bills Page -->
+      <div id="all-bills" class="content-page">
+        <h2 class="fw-bold mb-4">ใบแจ้งหนี้ทั้งหมด</h2>
+
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white fw-bold">
+            <i class="fa-solid fa-file-invoice-dollar me-2"></i>
+            รายการใบแจ้งหนี้ทั้งหมด
+          </div>
+          <div class="card-body bg-white">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light text-center">
+                  <tr>
+                    <th>เลขบิล</th>
+                    <th>ชื่อผู้ใช้น้ำ</th>
+                    <th>หมายเลขมิเตอร์</th>
+                    <th>ประจำเดือน</th>
+                    <th>หน่วยที่ใช้</th>
+                    <th>ยอดเงิน (บาท)</th>
+                    <th>สถานะ</th>
+                    <th>ตัวเลือก</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">INV-20250701</td>
+                    <td>นายสมชาย ใจดี</td>
+                    <td>W-1001</td>
+                    <td>กรกฎาคม 2568</td>
+                    <td class="text-end">22</td>
+                    <td class="text-end">88.00</td>
+                    <td class="text-center">
+                      <span class="badge bg-success">ชำระแล้ว</span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-primary">
+                        <i class="fa-solid fa-eye"></i> ดู
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">INV-20250601</td>
+                    <td>นางสาวสมหญิง รักดี</td>
+                    <td>W-1002</td>
+                    <td>มิถุนายน 2568</td>
+                    <td class="text-end">35</td>
+                    <td class="text-end">140.00</td>
+                    <td class="text-center">
+                      <span class="badge bg-warning text-dark">ค้างชำระ</span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-primary">
+                        <i class="fa-solid fa-eye"></i> ดู
+                      </button>
+                    </td>
+                  </tr>
+                  <!-- เพิ่มบรรทัดอื่นได้ตามต้องการ -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Users Page -->
+      <div id="manage-users" class="content-page">
+        <h2 class="fw-bold mb-4">จัดการผู้ใช้น้ำ</h2>
+
+        <!-- ปุ่มเพิ่มผู้ใช้ -->
+        <div class="mb-3 text-end">
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addUserModal"
+          >
+            <i class="fa-solid fa-user-plus me-1"></i> เพิ่มผู้ใช้น้ำ
+          </button>
+        </div>
+
+        <!-- ตารางผู้ใช้ -->
+        <div class="card shadow">
+          <div class="card-body bg-white">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light text-center">
+                  <tr>
+                    <th>รหัสผู้ใช้</th>
+                    <th>ชื่อผู้ใช้น้ำ</th>
+                    <th>เบอร์โทร</th>
+                    <th>หมายเลขมิเตอร์</th>
+                    <th>สถานะ</th>
+                    <th>ตัวเลือก</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">U001</td>
+                    <td>นายสมชาย ใจดี</td>
+                    <td>081-234-5678</td>
+                    <td>W-1001</td>
+                    <td class="text-center">
+                      <span class="badge bg-success">ใช้งาน</span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-secondary me-1">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">U002</td>
+                    <td>นางสาวสมหญิง รักดี</td>
+                    <td>089-999-9999</td>
+                    <td>W-1002</td>
+                    <td class="text-center">
+                      <span class="badge bg-danger">ระงับ</span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-secondary me-1">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!-- เพิ่มผู้ใช้เพิ่มเติมได้ -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal เพิ่มผู้ใช้ -->
+        <div
+          class="modal fade"
+          id="addUserModal"
+          tabindex="-1"
+          aria-labelledby="addUserModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form>
+                <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="addUserModalLabel">
+                    <i class="fa-solid fa-user-plus me-2"></i>เพิ่มผู้ใช้น้ำ
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="ปิด"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <label for="fullName" class="form-label fw-bold"
+                      >ชื่อ - นามสกุล</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="fullName"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="phone" class="form-label fw-bold"
+                      >เบอร์โทร</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="phone"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="meterId" class="form-label fw-bold"
+                      >หมายเลขมิเตอร์</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="meterId"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="status" class="form-label fw-bold">สถานะ</label>
+                    <select class="form-select" id="status">
+                      <option value="active">ใช้งาน</option>
+                      <option value="inactive">ระงับ</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">บันทึก</button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    ยกเลิก
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Meters Page -->
+      <div id="manage-meters" class="content-page">
+        <h2 class="fw-bold mb-4">จัดการมิเตอร์น้ำ</h2>
+
+        <!-- ปุ่มเพิ่มมิเตอร์ -->
+        <div class="mb-3 text-end">
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addMeterModal"
+          >
+            <i class="fa-solid fa-plus me-1"></i> เพิ่มมิเตอร์ใหม่
+          </button>
+        </div>
+
+        <!-- ตารางมิเตอร์ -->
+        <div class="card shadow">
+          <div class="card-body bg-white">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light text-center">
+                  <tr>
+                    <th>รหัสมิเตอร์</th>
+                    <th>ตำแหน่ง/สถานที่ติดตั้ง</th>
+                    <th>ผู้ใช้น้ำ</th>
+                    <th>สถานะ</th>
+                    <th>ตัวเลือก</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">W-1001</td>
+                    <td>บ้านเลขที่ 123 หมู่ 5</td>
+                    <td>นายสมชาย ใจดี</td>
+                    <td class="text-center">
+                      <span class="badge bg-success">ใช้งาน</span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-secondary me-1">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">W-1002</td>
+                    <td>อาคาร 2 ห้อง 202</td>
+                    <td>นางสาวสมหญิง รักดี</td>
+                    <td class="text-center">
+                      <span class="badge bg-secondary">ไม่ใช้งาน</span>
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-secondary me-1">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <!-- เพิ่มรายการเพิ่มเติมได้ -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal เพิ่มมิเตอร์ -->
+        <div
+          class="modal fade"
+          id="addMeterModal"
+          tabindex="-1"
+          aria-labelledby="addMeterModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form>
+                <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="addMeterModalLabel">
+                    <i class="fa-solid fa-plus me-2"></i>เพิ่มมิเตอร์ใหม่
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="ปิด"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <label for="meterId" class="form-label fw-bold"
+                      >รหัสมิเตอร์</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="meterId"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="location" class="form-label fw-bold"
+                      >ตำแหน่งติดตั้ง</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="location"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="owner" class="form-label fw-bold"
+                      >ชื่อผู้ใช้น้ำ</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="owner"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label for="meterStatus" class="form-label fw-bold"
+                      >สถานะ</label
+                    >
+                    <select class="form-select" id="meterStatus">
+                      <option value="active">ใช้งาน</option>
+                      <option value="inactive">ไม่ใช้งาน</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">บันทึก</button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    ยกเลิก
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manage Rates Page -->
+      <div id="manage-rates" class="content-page">
+        <h2 class="fw-bold mb-4">จัดการอัตราค่าน้ำ</h2>
+
+        <!-- ปุ่มเพิ่มอัตรา -->
+        <div class="mb-3 text-end">
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addRateModal"
+          >
+            <i class="fa-solid fa-plus me-1"></i> เพิ่มช่วงอัตราใหม่
+          </button>
+        </div>
+
+        <!-- ตารางอัตราค่าน้ำ -->
+        <div class="card shadow">
+          <div class="card-body bg-white">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light text-center">
+                  <tr>
+                    <th>ช่วงหน่วยน้ำ (หน่วย)</th>
+                    <th>ราคาต่อหน่วย (บาท)</th>
+                    <th>หมายเหตุ</th>
+                    <th>ตัวเลือก</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-center">0 - 10</td>
+                    <td class="text-end">5.00</td>
+                    <td>ขั้นต่ำ</td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-secondary me-1">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">11 - 20</td>
+                    <td class="text-end">6.50</td>
+                    <td>-</td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-secondary me-1">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center">21 ขึ้นไป</td>
+                    <td class="text-end">8.00</td>
+                    <td>อัตราสูงสุด</td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-outline-secondary me-1">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meter Map Page -->
+        <div id="meter-map" class="content-page">
+          <h2 class="fw-bold mb-4">แผนที่มิเตอร์น้ำ</h2>
+
+          <div class="card shadow">
+            <div class="card-body bg-white">
+              <div id="map" style="height: 500px; border-radius: 10px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal เพิ่มช่วงอัตรา -->
+        <div
+          class="modal fade"
+          id="addRateModal"
+          tabindex="-1"
+          aria-labelledby="addRateModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form>
+                <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="addRateModalLabel">
+                    <i class="fa-solid fa-plus me-2"></i>เพิ่มช่วงอัตราค่าน้ำ
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="ปิด"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <label for="fromUnit" class="form-label fw-bold"
+                        >จากหน่วย</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="fromUnit"
+                        required
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label for="toUnit" class="form-label fw-bold"
+                        >ถึงหน่วย</label
+                      >
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="toUnit"
+                        placeholder="ใส่สูงสุดหรือเว้นว่างหากไม่มีขีดจำกัด"
+                      />
+                    </div>
+                  </div>
+                  <div class="mt-3">
+                    <label for="ratePrice" class="form-label fw-bold"
+                      >ราคาต่อหน่วย (บาท)</label
+                    >
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control"
+                      id="ratePrice"
+                      required
+                    />
+                  </div>
+                  <div class="mt-3">
+                    <label for="note" class="form-label fw-bold"
+                      >หมายเหตุ (ถ้ามี)</label
+                    >
+                    <input type="text" class="form-control" id="note" />
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">บันทึก</button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    ยกเลิก
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal แสดงใบแจ้งหนี้ -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="invoiceModalLabel">
+          <i class="fa-solid fa-file-invoice-dollar me-2"></i>รายละเอียดใบแจ้งหนี้
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered">
           <tbody>
-            <tr>
-              <td class="text-center">01/07/2025</td>
-              <td>W-1001</td>
-              <td class="text-end">1234</td>
-              <td class="text-end">1256</td>
-              <td class="text-end text-success fw-bold">22</td>
-              <td>สมชาย</td>
-              <td class="text-center"><span class="badge bg-success">ปกติ</span></td>
-            </tr>
-            <tr>
-              <td class="text-center">01/06/2025</td>
-              <td>W-1001</td>
-              <td class="text-end">1200</td>
-              <td class="text-end">1234</td>
-              <td class="text-end text-success fw-bold">34</td>
-              <td>สมหญิง</td>
-              <td class="text-center"><span class="badge bg-warning text-dark">รอตรวจสอบ</span></td>
-            </tr>
-            <!-- สามารถเพิ่มข้อมูลใหม่ได้ที่นี่ -->
+            <tr><th>เลขที่ใบแจ้งหนี้</th><td id="inv-id"></td></tr>
+            <tr><th>ชื่อผู้ใช้น้ำ</th><td id="inv-name"></td></tr>
+            <tr><th>หมายเลขมิเตอร์</th><td id="inv-meter"></td></tr>
+            <tr><th>เดือน</th><td id="inv-month"></td></tr>
+            <tr><th>หน่วยที่ใช้</th><td id="inv-unit"></td></tr>
+            <tr><th>ยอดเงิน (บาท)</th><td id="inv-amount"></td></tr>
+            <tr><th>สถานะ</th><td id="inv-status"></td></tr>
           </tbody>
         </table>
       </div>
-    </div>
-  </div>
-</div>
-
-
-    <!-- All Bills Page -->
-<div id="all-bills" class="content-page">
-  <h2 class="fw-bold mb-4">ใบแจ้งหนี้ทั้งหมด</h2>
-
-  <div class="card shadow">
-    <div class="card-header bg-primary text-white fw-bold">
-      <i class="fa-solid fa-file-invoice-dollar me-2"></i> รายการใบแจ้งหนี้ทั้งหมด
-    </div>
-    <div class="card-body bg-white">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-light text-center">
-            <tr>
-              <th>เลขบิล</th>
-              <th>ชื่อผู้ใช้น้ำ</th>
-              <th>หมายเลขมิเตอร์</th>
-              <th>ประจำเดือน</th>
-              <th>หน่วยที่ใช้</th>
-              <th>ยอดเงิน (บาท)</th>
-              <th>สถานะ</th>
-              <th>ตัวเลือก</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-center">INV-20250701</td>
-              <td>นายสมชาย ใจดี</td>
-              <td>W-1001</td>
-              <td>กรกฎาคม 2568</td>
-              <td class="text-end">22</td>
-              <td class="text-end">88.00</td>
-              <td class="text-center"><span class="badge bg-success">ชำระแล้ว</span></td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> ดู</button>
-              </td>
-            </tr>
-            <tr>
-              <td class="text-center">INV-20250601</td>
-              <td>นางสาวสมหญิง รักดี</td>
-              <td>W-1002</td>
-              <td>มิถุนายน 2568</td>
-              <td class="text-end">35</td>
-              <td class="text-end">140.00</td>
-              <td class="text-center"><span class="badge bg-warning text-dark">ค้างชำระ</span></td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-eye"></i> ดู</button>
-              </td>
-            </tr>
-            <!-- เพิ่มบรรทัดอื่นได้ตามต้องการ -->
-          </tbody>
-        </table>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Manage Users Page -->
-<div id="manage-users" class="content-page">
-  <h2 class="fw-bold mb-4">จัดการผู้ใช้น้ำ</h2>
-
-  <!-- ปุ่มเพิ่มผู้ใช้ -->
-  <div class="mb-3 text-end">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-      <i class="fa-solid fa-user-plus me-1"></i> เพิ่มผู้ใช้น้ำ
-    </button>
-  </div>
-
-  <!-- ตารางผู้ใช้ -->
-  <div class="card shadow">
-    <div class="card-body bg-white">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-light text-center">
-            <tr>
-              <th>รหัสผู้ใช้</th>
-              <th>ชื่อผู้ใช้น้ำ</th>
-              <th>เบอร์โทร</th>
-              <th>หมายเลขมิเตอร์</th>
-              <th>สถานะ</th>
-              <th>ตัวเลือก</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-center">U001</td>
-              <td>นายสมชาย ใจดี</td>
-              <td>081-234-5678</td>
-              <td>W-1001</td>
-              <td class="text-center"><span class="badge bg-success">ใช้งาน</span></td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-            <tr>
-              <td class="text-center">U002</td>
-              <td>นางสาวสมหญิง รักดี</td>
-              <td>089-999-9999</td>
-              <td>W-1002</td>
-              <td class="text-center"><span class="badge bg-danger">ระงับ</span></td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-            <!-- เพิ่มผู้ใช้เพิ่มเติมได้ -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal เพิ่มผู้ใช้ -->
-  <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form>
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="addUserModalLabel"><i class="fa-solid fa-user-plus me-2"></i>เพิ่มผู้ใช้น้ำ</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="fullName" class="form-label fw-bold">ชื่อ - นามสกุล</label>
-              <input type="text" class="form-control" id="fullName" required>
-            </div>
-            <div class="mb-3">
-              <label for="phone" class="form-label fw-bold">เบอร์โทร</label>
-              <input type="text" class="form-control" id="phone" required>
-            </div>
-            <div class="mb-3">
-              <label for="meterId" class="form-label fw-bold">หมายเลขมิเตอร์</label>
-              <input type="text" class="form-control" id="meterId" required>
-            </div>
-            <div class="mb-3">
-              <label for="status" class="form-label fw-bold">สถานะ</label>
-              <select class="form-select" id="status">
-                <option value="active">ใช้งาน</option>
-                <option value="inactive">ระงับ</option>
-              </select>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-success">บันทึก</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Manage Meters Page -->
-<div id="manage-meters" class="content-page">
-  <h2 class="fw-bold mb-4">จัดการมิเตอร์น้ำ</h2>
-
-  <!-- ปุ่มเพิ่มมิเตอร์ -->
-  <div class="mb-3 text-end">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMeterModal">
-      <i class="fa-solid fa-plus me-1"></i> เพิ่มมิเตอร์ใหม่
-    </button>
-  </div>
-
-  <!-- ตารางมิเตอร์ -->
-  <div class="card shadow">
-    <div class="card-body bg-white">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-light text-center">
-            <tr>
-              <th>รหัสมิเตอร์</th>
-              <th>ตำแหน่ง/สถานที่ติดตั้ง</th>
-              <th>ผู้ใช้น้ำ</th>
-              <th>สถานะ</th>
-              <th>ตัวเลือก</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-center">W-1001</td>
-              <td>บ้านเลขที่ 123 หมู่ 5</td>
-              <td>นายสมชาย ใจดี</td>
-              <td class="text-center"><span class="badge bg-success">ใช้งาน</span></td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-            <tr>
-              <td class="text-center">W-1002</td>
-              <td>อาคาร 2 ห้อง 202</td>
-              <td>นางสาวสมหญิง รักดี</td>
-              <td class="text-center"><span class="badge bg-secondary">ไม่ใช้งาน</span></td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-            <!-- เพิ่มรายการเพิ่มเติมได้ -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal เพิ่มมิเตอร์ -->
-  <div class="modal fade" id="addMeterModal" tabindex="-1" aria-labelledby="addMeterModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form>
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="addMeterModalLabel"><i class="fa-solid fa-plus me-2"></i>เพิ่มมิเตอร์ใหม่</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="meterId" class="form-label fw-bold">รหัสมิเตอร์</label>
-              <input type="text" class="form-control" id="meterId" required>
-            </div>
-            <div class="mb-3">
-              <label for="location" class="form-label fw-bold">ตำแหน่งติดตั้ง</label>
-              <input type="text" class="form-control" id="location" required>
-            </div>
-            <div class="mb-3">
-              <label for="owner" class="form-label fw-bold">ชื่อผู้ใช้น้ำ</label>
-              <input type="text" class="form-control" id="owner" required>
-            </div>
-            <div class="mb-3">
-              <label for="meterStatus" class="form-label fw-bold">สถานะ</label>
-              <select class="form-select" id="meterStatus">
-                <option value="active">ใช้งาน</option>
-                <option value="inactive">ไม่ใช้งาน</option>
-              </select>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-success">บันทึก</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Manage Rates Page -->
-<div id="manage-rates" class="content-page">
-  <h2 class="fw-bold mb-4">จัดการอัตราค่าน้ำ</h2>
-
-  <!-- ปุ่มเพิ่มอัตรา -->
-  <div class="mb-3 text-end">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRateModal">
-      <i class="fa-solid fa-plus me-1"></i> เพิ่มช่วงอัตราใหม่
-    </button>
-  </div>
-
-  <!-- ตารางอัตราค่าน้ำ -->
-  <div class="card shadow">
-    <div class="card-body bg-white">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-light text-center">
-            <tr>
-              <th>ช่วงหน่วยน้ำ (หน่วย)</th>
-              <th>ราคาต่อหน่วย (บาท)</th>
-              <th>หมายเหตุ</th>
-              <th>ตัวเลือก</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-center">0 - 10</td>
-              <td class="text-end">5.00</td>
-              <td>ขั้นต่ำ</td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-            <tr>
-              <td class="text-center">11 - 20</td>
-              <td class="text-end">6.50</td>
-              <td>-</td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-            <tr>
-              <td class="text-center">21 ขึ้นไป</td>
-              <td class="text-end">8.00</td>
-              <td>อัตราสูงสุด</td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- Meter Map Page -->
-<div id="meter-map" class="content-page">
-  <h2 class="fw-bold mb-4">แผนที่มิเตอร์น้ำ</h2>
-
-  <div class="card shadow">
-    <div class="card-body bg-white">
-      <div id="map" style="height: 500px; border-radius: 10px;"></div>
-    </div>
-  </div>
-</div>
-
-
-  <!-- Modal เพิ่มช่วงอัตรา -->
-  <div class="modal fade" id="addRateModal" tabindex="-1" aria-labelledby="addRateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form>
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="addRateModalLabel"><i class="fa-solid fa-plus me-2"></i>เพิ่มช่วงอัตราค่าน้ำ</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิด"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row g-2">
-              <div class="col-md-6">
-                <label for="fromUnit" class="form-label fw-bold">จากหน่วย</label>
-                <input type="number" class="form-control" id="fromUnit" required>
-              </div>
-              <div class="col-md-6">
-                <label for="toUnit" class="form-label fw-bold">ถึงหน่วย</label>
-                <input type="number" class="form-control" id="toUnit" placeholder="ใส่สูงสุดหรือเว้นว่างหากไม่มีขีดจำกัด">
-              </div>
-            </div>
-            <div class="mt-3">
-              <label for="ratePrice" class="form-label fw-bold">ราคาต่อหน่วย (บาท)</label>
-              <input type="number" step="0.01" class="form-control" id="ratePrice" required>
-            </div>
-            <div class="mt-3">
-              <label for="note" class="form-label fw-bold">หมายเหตุ (ถ้ามี)</label>
-              <input type="text" class="form-control" id="note">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-success">บันทึก</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-  <script>
-    function showPage(pageId) {
-      // ซ่อนทุกหน้าก่อน
-      document.querySelectorAll('.content-page').forEach(page => page.classList.remove('active'));
-
-      // แสดงหน้าที่เลือก
-      const selectedPage = document.getElementById(pageId);
-      if (selectedPage) {
-        selectedPage.classList.add('active');
-      }
-
-      // ลบ active จากทุกลิงก์
-      document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-
-      // ใส่ active ให้กับลิงก์ที่คลิก
-      document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-        if (link.getAttribute('onclick')?.includes(pageId)) {
-          link.classList.add('active');
-        }
-      });
-
-      // เปิดเมนูบิลหากเป็นเมนูย่อยบิล
-      if (['meter-record', 'record-history', 'all-bills'].includes(pageId)) {
-        const collapseEl = document.getElementById('billSubMenu');
-        const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
-        bsCollapse.show();
-      }
-
-      // เปิดเมนูย่อยจัดการข้อมูลหากเป็นเมนูย่อยในนี้
-      if (['manage-users', 'manage-meters', 'meter-map', 'manage-rates'].includes(pageId)) {
-        const collapseEl = document.getElementById('manageDataSubMenu');
-        const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
-        bsCollapse.show();
-      }
-    }
-
-    // สลับคลาส collapsed ของ sidebar เมื่อกดปุ่ม hamburger
-    document.getElementById('toggleSidebarBtn').addEventListener('click', function() {
-      document.querySelector('.sidebar').classList.toggle('collapsed');
-    });
-  </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-  function handleMeterSelect(select) {
-    const note = document.getElementById('meterNote');
-    if (select.value) {
-      note.textContent = `คุณเลือกมิเตอร์หมายเลข ${select.value} แล้ว กำลังโหลดข้อมูล...`;
-      // คุณสามารถเขียนโค้ดดึงข้อมูลล่าสุดจาก backend หรือ API ได้ตรงนี้
-    } else {
-      note.textContent = 'เมื่อเลือกมิเตอร์ ระบบจะดึงค่าล่าสุดมาให้โดยอัตโนมัติ';
-    }
-  }
-</script>
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-  // ฟังก์ชันเริ่มต้นเมื่อเปิดหน้าแผนที่
-  function initMap() {
-    const map = L.map('map').setView([13.7563, 100.5018], 13); // Bangkok
+  // เพิ่ม event ให้ปุ่มดูทุกปุ่มในตาราง
+  document.querySelectorAll("#all-bills .btn-outline-primary").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const row = btn.closest("tr"); // หาแถวที่คลิก
+      document.getElementById("inv-id").textContent = row.children[0].textContent;
+      document.getElementById("inv-name").textContent = row.children[1].textContent;
+      document.getElementById("inv-meter").textContent = row.children[2].textContent;
+      document.getElementById("inv-month").textContent = row.children[3].textContent;
+      document.getElementById("inv-unit").textContent = row.children[4].textContent;
+      document.getElementById("inv-amount").textContent = row.children[5].textContent;
+      document.getElementById("inv-status").innerHTML = row.children[6].innerHTML;
 
-    // แผนที่พื้นหลัง
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+      // แสดง Modal
+      const modal = new bootstrap.Modal(document.getElementById("invoiceModal"));
+      modal.show();
+    });
+  });
+</script>
 
-    // ตัวอย่าง: ปักหมุดตำแหน่งมิเตอร์
-    const meters = [
-      {
-        id: 'W-1001',
-        owner: 'นายสมชาย',
-        lat: 13.7563,
-        lng: 100.5018,
-        location: 'บ้านเลขที่ 123'
-      },
-      {
-        id: 'W-1002',
-        owner: 'นางสาวสมหญิง',
-        lat: 13.75,
-        lng: 100.52,
-        location: 'หมู่บ้านสุขใจ'
-      }
-    ];
+      <script>
+        function showPage(pageId) {
+          // ซ่อนทุกหน้าก่อน
+          document
+            .querySelectorAll(".content-page")
+            .forEach((page) => page.classList.remove("active"));
 
-    // สร้าง Marker สำหรับแต่ละมิเตอร์
-    meters.forEach(meter => {
-      L.marker([meter.lat, meter.lng])
-        .addTo(map)
-        .bindPopup(`
+          // แสดงหน้าที่เลือก
+          const selectedPage = document.getElementById(pageId);
+          if (selectedPage) {
+            selectedPage.classList.add("active");
+          }
+
+          // ลบ active จากทุกลิงก์
+          document
+            .querySelectorAll(".sidebar .nav-link")
+            .forEach((link) => link.classList.remove("active"));
+
+          // ใส่ active ให้กับลิงก์ที่คลิก
+          document.querySelectorAll(".sidebar .nav-link").forEach((link) => {
+            if (link.getAttribute("onclick")?.includes(pageId)) {
+              link.classList.add("active");
+            }
+          });
+
+          // เปิดเมนูบิลหากเป็นเมนูย่อยบิล
+          if (
+            ["meter-record", "record-history", "all-bills"].includes(pageId)
+          ) {
+            const collapseEl = document.getElementById("billSubMenu");
+            const bsCollapse = new bootstrap.Collapse(collapseEl, {
+              toggle: false,
+            });
+            bsCollapse.show();
+          }
+
+          // เปิดเมนูย่อยจัดการข้อมูลหากเป็นเมนูย่อยในนี้
+          if (
+            [
+              "manage-users",
+              "manage-meters",
+              "meter-map",
+              "manage-rates",
+            ].includes(pageId)
+          ) {
+            const collapseEl = document.getElementById("manageDataSubMenu");
+            const bsCollapse = new bootstrap.Collapse(collapseEl, {
+              toggle: false,
+            });
+            bsCollapse.show();
+          }
+        }
+
+        // สลับคลาส collapsed ของ sidebar เมื่อกดปุ่ม hamburger
+        document
+          .getElementById("toggleSidebarBtn")
+          .addEventListener("click", function () {
+            document.querySelector(".sidebar").classList.toggle("collapsed");
+          });
+      </script>
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+      <script>
+        function handleMeterSelect(select) {
+          const note = document.getElementById("meterNote");
+          if (select.value) {
+            note.textContent = `คุณเลือกมิเตอร์หมายเลข ${select.value} แล้ว กำลังโหลดข้อมูล...`;
+            // คุณสามารถเขียนโค้ดดึงข้อมูลล่าสุดจาก backend หรือ API ได้ตรงนี้
+          } else {
+            note.textContent =
+              "เมื่อเลือกมิเตอร์ ระบบจะดึงค่าล่าสุดมาให้โดยอัตโนมัติ";
+          }
+        }
+      </script>
+      <!-- Leaflet JS -->
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+      <script>
+        // ฟังก์ชันเริ่มต้นเมื่อเปิดหน้าแผนที่
+        function initMap() {
+          const map = L.map("map").setView([13.7563, 100.5018], 13); // Bangkok
+
+          // แผนที่พื้นหลัง
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors",
+          }).addTo(map);
+
+          // ตัวอย่าง: ปักหมุดตำแหน่งมิเตอร์
+          const meters = [
+            {
+              id: "W-1001",
+              owner: "นายสมชาย",
+              lat: 13.7563,
+              lng: 100.5018,
+              location: "บ้านเลขที่ 123",
+            },
+            {
+              id: "W-1002",
+              owner: "นางสาวสมหญิง",
+              lat: 13.75,
+              lng: 100.52,
+              location: "หมู่บ้านสุขใจ",
+            },
+          ];
+
+          // สร้าง Marker สำหรับแต่ละมิเตอร์
+          meters.forEach((meter) => {
+            L.marker([meter.lat, meter.lng]).addTo(map).bindPopup(`
           <strong>มิเตอร์ ${meter.id}</strong><br/>
           ผู้ใช้น้ำ: ${meter.owner}<br/>
           ที่ตั้ง: ${meter.location}
         `);
-    });
-  }
+          });
+        }
 
-  // เรียกเมื่อเปิดหน้านี้
-  document.addEventListener('DOMContentLoaded', () => {
-    const observer = new MutationObserver(() => {
-      const page = document.getElementById('meter-map');
-      if (page && page.classList.contains('active')) {
-        initMap();
-        observer.disconnect(); // โหลดแค่ครั้งเดียว
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+        // เรียกเมื่อเปิดหน้านี้
+        document.addEventListener("DOMContentLoaded", () => {
+          const observer = new MutationObserver(() => {
+            const page = document.getElementById("meter-map");
+            if (page && page.classList.contains("active")) {
+              initMap();
+              observer.disconnect(); // โหลดแค่ครั้งเดียว
+            }
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+        });
+      </script>
+      <script>
+  document.querySelector("#addUserModal form").addEventListener("submit", function (e) {
+    e.preventDefault(); // ไม่ให้หน้าเว็บ reload
+    const fullName = document.getElementById("fullName").value;
+    const phone = document.getElementById("phone").value;
+    const meterId = document.getElementById("meterId").value;
+    const status = document.getElementById("status").value;
+
+    // ตัวอย่างแสดงใน console
+    console.log("เพิ่มผู้ใช้น้ำ:", { fullName, phone, meterId, status });
+
+    alert("บันทึกผู้ใช้น้ำใหม่เรียบร้อย!");
+
+    // ปิด modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById("addUserModal"));
+    modal.hide();
+
+    // เคลียร์ฟอร์ม (ถ้าต้องการ)
+    this.reset();
+  });
+</script>
+<script>
+  document.querySelector("#addMeterModal form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const meterId = document.getElementById("meterId").value;
+    const location = document.getElementById("location").value;
+    const owner = document.getElementById("owner").value;
+    const meterStatus = document.getElementById("meterStatus").value;
+
+    console.log("เพิ่มมิเตอร์:", { meterId, location, owner, meterStatus });
+    alert("เพิ่มมิเตอร์สำเร็จ!");
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById("addMeterModal"));
+    modal.hide();
+    this.reset();
+  });
+</script>
+<script>
+  document.querySelector("#addRateModal form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const fromUnit = document.getElementById("fromUnit").value;
+    const toUnit = document.getElementById("toUnit").value;
+    const ratePrice = document.getElementById("ratePrice").value;
+    const note = document.getElementById("note").value;
+
+    console.log("เพิ่มอัตราค่าน้ำ:", { fromUnit, toUnit, ratePrice, note });
+    alert("บันทึกอัตราค่าน้ำสำเร็จ!");
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById("addRateModal"));
+    modal.hide();
+    this.reset();
   });
 </script>
 
-</body>
+    </div>
+  </body>
 </html>
